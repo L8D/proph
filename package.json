@@ -1,0 +1,17 @@
+{
+  "name": "proph",
+  "version": "0.0.1",
+  "description": "A tiny, simple and fast futures implementation.",
+  "main": "proph.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/L8D/proph.git"
+  },
+  "keywords": ["monads", "promises", "futures", "asynchronous", "async"],
+  "author": "Tenor Biel <tenorbiel@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/L8D/proph/issues"
+  },
+  "homepage": "https://github.com/L8D/proph"
+}
