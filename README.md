@@ -1,4 +1,4 @@
-proph
+proph [![Build Status](http://img.shields.io/travis/L8D/proph.svg?style=flat)](https://travis-ci.org/L8D/proph) [![NPM Version](http://img.shields.io/npm/v/proph.svg?style=flat)](https://npmjs.org/package/proph) [![License](http://img.shields.io/npm/l/proph.svg?style=flat)](https://github.com/L8D/proph/blob/master/LICENSE)
 =====
 
 A tiny, simple and fast futures implementation.
