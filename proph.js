@@ -104,6 +104,19 @@
     };
   };
 
+  // wrapPromise :: ((a...) -> Promise a b) -> (a...) -> Future a b
+  Future.wrapPromise = function wrapPromise(fn, thisArg) {
+    return function() {
+      var argooments = arguments;
+
+      return new Future(function(reject, resolve) {
+        var promise = fn.apply(thisArg, argooments);
+
+        promise.then(resolve, reject);
+      });
+    };
+  };
+
   var proto = Future.prototype = {
     // bind :: Future a b -> (b -> Future a c) -> Future a c
     bind: function bind(binder) {
