@@ -229,11 +229,16 @@
       });
     },
 
-    // and :: Future a b -> Future a c -> Future a c
-    and: function and(future) {
+    // concat :: Future a b -> Future a c -> Future a c
+    concat: function and(future) {
       return this.bind(function() {
         return future;
       });
+    },
+
+    // equals :: Future a b -> Future a b -> Bool
+    equals: function(future) {
+      return this === future;
     },
 
     exec: function exec() {
