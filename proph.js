@@ -34,16 +34,16 @@
   }
 
   // resolve :: b -> Future a b
-  Future.resolve = function resolve(a) {
+  Future.resolve = function resolve(resolution) {
     return new Future(function(reject, resolve) {
-      resolve(a);
+      resolve(resolution);
     });
   };
 
   // reject :: a -> Future a b
-  Future.reject = function reject(b) {
+  Future.reject = function reject(rejection) {
     return new Future(function(reject, resolve) {
-      resolve(b);
+      reject(rejection);
     });
   };
 
@@ -58,12 +58,12 @@
       var rejected;
 
       var schedule = function(index) {
-        argooments[index].fork(function(a) {
+        argooments[index].fork(function(left) {
           if (!rejected) {
             rejected = true;
-            reject(a);
+            reject(left);
           }
-        }, function(b) {
+        }, function(right) {
           resolutions[index] = b;
 
           if (!rejected && !--unfinished) {
@@ -123,10 +123,10 @@
       var fork = this.fork;
 
       return new Future(function(reject, resolve) {
-        fork(function(a) {
-          reject(a);
-        }, function(b) {
-          binder(b).fork(reject, resolve);
+        fork(function(left) {
+          reject(left);
+        }, function(right) {
+          binder(right).fork(reject, resolve);
         });
       });
     },
@@ -136,10 +136,10 @@
       var fork = this.fork;
 
       return new Future(function(reject, resolve) {
-        fork(function(a) {
-          binder(a).fork(reject, resolve);
-        }, function(b) {
-          resolve(b);
+        fork(function(left) {
+          binder(left).fork(reject, resolve);
+        }, function(right) {
+          resolve(right);
         });
       });
     },
@@ -149,10 +149,10 @@
       var fork = this.fork;
 
       return new Future(function(reject, resolve) {
-        fork(function(a) {
-          rejecter(a).fork(reject, resolve);
-        }, function(b) {
-          resolver(b).fork(reject, resolve);
+        fork(function(left) {
+          rejecter(left).fork(reject, resolve);
+        }, function(right) {
+          resolver(right).fork(reject, resolve);
         });
       });
     },
@@ -162,10 +162,10 @@
       var fork = this.fork;
 
       return new Future(function(reject, resolve) {
-        fork(function(a) {
-          reject(a);
-        }, function(b) {
-          resolve(iterator(b));
+        fork(function(left) {
+          reject(left);
+        }, function(right) {
+          resolve(iterator(right));
         });
       });
     },
@@ -175,10 +175,10 @@
       var fork = this.fork;
 
       return new Future(function(reject, resolve) {
-        fork(function(a) {
-          reject(iterator(a));
-        }, function(b) {
-          resolve(b);
+        fork(function(left) {
+          reject(iterator(left));
+        }, function(right) {
+          resolve(right);
         });
       });
     },
@@ -188,10 +188,10 @@
       var fork = this.fork;
 
       return new Future(function(reject, resolve) {
-        fork(function(a) {
-          reject(rejecter(a));
-        }, function(b) {
-          resolve(resolver(b));
+        fork(function(left) {
+          reject(rejecter(left));
+        }, function(right) {
+          resolve(resolver(right));
         });
       });
     },
@@ -201,10 +201,10 @@
       var fork = this.fork;
 
       return new Future(function(reject, resolve) {
-        fork(function(a) {
-          resolve(rejecter(a));
-        }, function(b) {
-          resolve(resolver(b));
+        fork(function(left) {
+          resolve(rejecter(left));
+        }, function(right) {
+          resolve(resolver(right));
         });
       });
     },
@@ -214,10 +214,10 @@
       var fork = this.fork;
 
       return new Future(function(reject, resolve) {
-        fork(function(a) {
-          reject(rejector(a));
-        }, function(b) {
-          reject(resolver(b));
+        fork(function(left) {
+          reject(rejector(left));
+        }, function(right) {
+          reject(resolver(right));
         });
       });
     },
@@ -227,18 +227,18 @@
       var fork = this.fork;
 
       return new Future(function(reject, resolve) {
-        fork(function(a) {
-          resolve(a);
-        }, function(b) {
-          reject(b);
+        fork(function(left) {
+          resolve(left);
+        }, function(right) {
+          reject(right);
         });
       });
     },
 
     // ap :: Future a (b -> c) -> Future a b -> Future a c
     ap: function ap(future) {
-      return this.bind(function(iterator) {
-        return future.map(iterator);
+      return this.bind(function(fn) {
+        return future.map(fn);
       });
     },
 
