@@ -104,7 +104,7 @@
     };
   };
 
-  Future.prototype = {
+  var proto = Future.prototype = {
     // bind :: Future a b -> (b -> Future a c) -> Future a c
     bind: function bind(binder) {
       var fork = this.fork;
@@ -242,6 +242,9 @@
       }, function() {});
     }
   };
+
+  proto.chain = proto.bind;
+  proto.of = Future.of;
 
   return Future;
 });
