@@ -1,6 +1,6 @@
 {
   "name": "proph",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "A tiny, simple and fast futures implementation.",
   "main": "proph.js",
   "ignore": ["package.json", "component.json", ".npmignore"]
