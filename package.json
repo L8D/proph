@@ -7,11 +7,20 @@
     "type": "git",
     "url": "git://github.com/L8D/proph.git"
   },
-  "keywords": ["monads", "promises", "futures", "asynchronous", "async"],
+  "keywords": [
+    "monads",
+    "promises",
+    "futures",
+    "asynchronous",
+    "async"
+  ],
   "author": "Tenor Biel <tenorbiel@gmail.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/L8D/proph/issues"
   },
-  "homepage": "https://github.com/L8D/proph"
+  "homepage": "https://github.com/L8D/proph",
+  "devDependencies": {
+    "tape": "^3.0.1"
+  }
 }
