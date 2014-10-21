@@ -123,9 +123,7 @@
       var fork = this.fork;
 
       return new Future(function(reject, resolve) {
-        fork(function(left) {
-          reject(left);
-        }, function(right) {
+        fork(reject, function(right) {
           binder(right).fork(reject, resolve);
         });
       });
@@ -138,9 +136,7 @@
       return new Future(function(reject, resolve) {
         fork(function(left) {
           binder(left).fork(reject, resolve);
-        }, function(right) {
-          resolve(right);
-        });
+        }, resolve);
       });
     },
 
@@ -162,9 +158,7 @@
       var fork = this.fork;
 
       return new Future(function(reject, resolve) {
-        fork(function(left) {
-          reject(left);
-        }, function(right) {
+        fork(reject, function(right) {
           resolve(iterator(right));
         });
       });
@@ -177,9 +171,7 @@
       return new Future(function(reject, resolve) {
         fork(function(left) {
           reject(iterator(left));
-        }, function(right) {
-          resolve(right);
-        });
+        }, resolve);
       });
     },
 
@@ -229,9 +221,7 @@
       return new Future(function(reject, resolve) {
         fork(function(left) {
           resolve(left);
-        }, function(right) {
-          reject(right);
-        });
+        }, reject);
       });
     },
 
@@ -243,7 +233,7 @@
     },
 
     // concat :: Future a b -> Future a c -> Future a c
-    concat: function and(future) {
+    concat: function concat(future) {
       return this.bind(function() {
         return future;
       });
