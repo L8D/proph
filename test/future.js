@@ -162,3 +162,29 @@ test('Future#fold', function(t) {
     }, t.fail);
   });
 });
+
+test('Future#swap', function(t) {
+  t.plan(2);
+
+  rejecter.swap().fork(t.fail, function(msg) {
+    t.equal(msg, rejection);
+  });
+
+  resolver.swap().fork(function(msg) {
+    t.equal(msg, resolution);
+  }, t.fail);
+});
+
+test('Future#ap', function(t) {
+  t.plan(2);
+
+  var future = Future.resolve(toUpperCase);
+
+  future.ap(rejecter).fork(function(msg) {
+    t.equal(msg, rejection);
+  }, t.fail);
+
+  future.ap(resolver).fork(t.fail, function(msg) {
+    t.equal(msg, toUpperCase(resolution));
+  });
+});
