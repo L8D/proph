@@ -9,7 +9,7 @@
   'use strict';
 
   if (typeof define === 'function' && define.amd) {
-    define(factory);
+    define('proph', factory);
   } else if (typeof exports === 'object') {
     module.exports = factory();
   } else {
