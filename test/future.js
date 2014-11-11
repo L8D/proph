@@ -1,4 +1,6 @@
-var test = require('tape');
+'use strict';
+
+var describe = require('tape-bdd');
 var Future = require('../proph');
 
 var rejection = 'reJECTED!';
@@ -11,180 +13,212 @@ function toUpperCase(str) {
   return str.toUpperCase();
 };
 
-test('Future#fork', function(t) {
-  t.plan(2);
-
-  resolver.fork(t.fail, function(msg) {
-    t.equal(msg, resolution);
+describe('fork', function(it) {
+  it('should call resolver callback for resolved', function(assert) {
+    resolver.fork(assert.fail, function(msg) {
+      assert.equal(msg, resolution);
+    });
   });
 
-  rejecter.fork(function(msg) {
-    t.equal(msg, rejection);
-  }, t.fail);
-});
-
-test('Future#exec', function(t) {
-  t.plan(2);
-
-  t.throws(function() {
-    rejecter.exec();
-  }, new RegExp('^' + rejection + '$'));
-
-  t.doesNotThrow(function() {
-    resolver.exec();
+  it('should call rejecter callback for rejected', function(assert) {
+    rejecter.fork(function(msg) {
+      assert.equal(msg, rejection);
+    }, assert.fail);
   });
 });
 
-test('Future#map', function(t) {
-  t.plan(4);
-
-  rejecter.map(toUpperCase).fork(function(msg) {
-    t.equal(msg, rejection);
-  }, t.fail);
-
-  resolver.map(toUpperCase).fork(t.fail, function(msg) {
-    t.equal(msg, toUpperCase(resolution));
+describe('exec', function(it) {
+  it('should throw when executing rejected', function(assert) {
+    assert.throws(function() {
+      rejecter.exec();
+    }, new RegExp('^' + rejection + '$'));
   });
 
-  t.test('Future#lmap', function(t) {
-    t.plan(2);
+  it('should not throw when executing resolved', function(assert) {
+    assert.doesNotThrow(function() {
+      resolver.exec();
+    });
+  });
+});
 
+describe('map', function(it) {
+  it('should not apply given func to rejected', function(assert) {
+    rejecter.map(toUpperCase).fork(function(msg) {
+      assert.equal(msg, rejection);
+    }, assert.fail);
+  });
+
+  it('should apply given func to resolved', function(assert) {
+    resolver.map(toUpperCase).fork(assert.fail, function(msg) {
+      assert.equal(msg, toUpperCase(resolution));
+    });
+  });
+});
+
+describe('lmap', function(it) {
+  it('should apply given func to rejected', function(assert) {
     rejecter.lmap(toUpperCase).fork(function(msg) {
-      t.equal(msg, toUpperCase(rejection));
-    }, t.fail);
-
-    resolver.lmap(toUpperCase).fork(t.fail, function(msg) {
-      t.equal(msg, resolution);
-    });
+      assert.equal(msg, toUpperCase(rejection));
+    }, assert.fail);
   });
 
-  t.test('Future#bimap', function(t) {
-    t.plan(2);
-
-    rejecter.bimap(toUpperCase, t.fail).fork(function(msg) {
-      t.equal(msg, toUpperCase(rejection));
-    }, t.fail);
-
-    resolver.bimap(t.fail, toUpperCase).fork(t.fail, function(msg) {
-      t.equal(msg, toUpperCase(resolution));
+  it('should not apply given func to resolved', function(assert) {
+    resolver.lmap(toUpperCase).fork(assert.fail, function(msg) {
+      assert.equal(msg, resolution);
     });
   });
 });
 
-test('Future#bind', function(t) {
-  t.plan(5);
-
-  rejecter.bind(t.fail).fork(function(msg) {
-    t.equal(msg, rejection);
-  }, t.fail);
-
-  resolver.bind(function(msg) {
-    return Future.resolve(toUpperCase(msg));
-  }).fork(t.fail, function(msg) {
-    t.equal(msg, toUpperCase(resolution));
+describe('bimap', function(it) {
+  it('should apply first given func to rejected', function(assert) {
+    rejecter.bimap(toUpperCase, assert.fail).fork(function(msg) {
+      assert.equal(msg, toUpperCase(rejection));
+    }, assert.fail);
   });
 
-  resolver.bind(function(msg) {
-    return Future.reject(toUpperCase(msg));
-  }).fork(function(msg) {
-    t.equal(msg, toUpperCase(resolution));
-  }, t.fail);
+  it('should apply second given func to resolved', function(assert) {
+    resolver.bimap(assert.fail, toUpperCase).fork(assert.fail, function(msg) {
+      assert.equal(msg, toUpperCase(resolution));
+    });
+  });
+});
 
-  t.test('Future#lbind', function(t) {
-    t.plan(3);
+describe('bind', function(it) {
+  it('should not bind given func to rejected', function(assert) {
+    rejecter.bind(assert.fail).fork(function(msg) {
+      assert.equal(msg, rejection);
+    }, assert.fail);
+  });
 
+  it('should bind given func from resolved to resolved', function(assert) {
+    resolver.bind(function(msg) {
+      return Future.resolve(toUpperCase(msg));
+    }).fork(assert.fail, function(msg) {
+      assert.equal(msg, toUpperCase(resolution));
+    });
+  });
+
+  it('should bind given func from rejected to resolved', function(assert) {
+    resolver.bind(function(msg) {
+      return Future.reject(toUpperCase(msg));
+    }).fork(function(msg) {
+      assert.equal(msg, toUpperCase(resolution));
+    }, assert.fail);
+  });
+});
+
+describe('lbind', function(it) {
+  it('should bind given func from rejected to rejected', function(assert) {
     rejecter.lbind(function(msg) {
       return Future.reject(toUpperCase(msg));
     }).fork(function(msg) {
-      t.equal(msg, toUpperCase(rejection));
-    }, t.fail);
+      assert.equal(msg, toUpperCase(rejection));
+    }, assert.fail);
+  });
 
+  it('should bind given func from rejected to resolved', function(assert) {
     rejecter.lbind(function(msg) {
       return Future.resolve(toUpperCase(msg));
-    }).fork(t.fail, function(msg) {
-      t.equal(msg, toUpperCase(rejection));
-    });
-
-    resolver.lbind(t.fail).fork(t.tail, function(msg) {
-      t.equal(msg, resolution);
+    }).fork(assert.fail, function(msg) {
+      assert.equal(msg, toUpperCase(rejection));
     });
   });
 
-  t.test('Future#bibind', function(t) {
-    t.plan(4);
+  it('should not bind given func to rejected', function(assert) {
+    resolver.lbind(assert.fail).fork(assert.tail, function(msg) {
+      assert.equal(msg, resolution);
+    });
+  });
+});
 
+describe('bibind', function(it) {
+  it('should only bind first given func rejected->rejected', function(assert) {
     rejecter.bibind(function(msg) {
       return Future.reject(toUpperCase(msg));
-    }, t.fail).fork(function(msg) {
-      t.equal(msg, toUpperCase(rejection));
-    }, t.fail);
+    }, assert.fail).fork(function(msg) {
+      assert.equal(msg, toUpperCase(rejection));
+    }, assert.fail);
+  });
 
+  it('should only bind first given func rejected->resolved', function(assert) {
     rejecter.bibind(function(msg) {
       return Future.resolve(toUpperCase(msg));
-    }, t.fail).fork(t.fail, function(msg) {
-      t.equal(msg, toUpperCase(rejection));
+    }, assert.fail).fork(assert.fail, function(msg) {
+      assert.equal(msg, toUpperCase(rejection));
     });
+  });
 
-    resolver.bibind(t.fail, function(msg) {
+  it('should only bind first given func resolved->rejected', function(assert) {
+    resolver.bibind(assert.fail, function(msg) {
       return Future.reject(toUpperCase(msg));
     }).fork(function(msg) {
-      t.equal(msg, toUpperCase(resolution));
-    }, t.fail);
+      assert.equal(msg, toUpperCase(resolution));
+    }, assert.fail);
+  });
 
-    resolver.bibind(t.fail, function(msg) {
+  it('should only bind first given func resolved->resolved', function(assert) {
+    resolver.bibind(assert.fail, function(msg) {
       return Future.resolve(toUpperCase(msg));
-    }).fork(t.fail, function(msg) {
-      t.equal(msg, toUpperCase(resolution));
+    }).fork(assert.fail, function(msg) {
+      assert.equal(msg, toUpperCase(resolution));
     });
   });
 });
 
-test('Future#fold', function(t) {
-  t.plan(3);
-
-  rejecter.fold(toUpperCase, t.fail).fork(t.fail, function(msg) {
-    t.equal(msg, toUpperCase(rejection));
+describe('fold', function(it) {
+  it('should fold given func from rejected to resolved', function(assert) {
+    rejecter.fold(toUpperCase, assert.fail).fork(assert.fail, function(msg) {
+      assert.equal(msg, toUpperCase(rejection));
+    });
   });
 
-  resolver.fold(t.fail, toUpperCase).fork(t.fail, function(msg) {
-    t.equal(msg, toUpperCase(resolution));
-  });
-
-  t.test('Future#lfold', function(t) {
-    t.plan(2);
-
-    rejecter.lfold(toUpperCase, t.fail).fork(function(msg) {
-      t.equal(msg, toUpperCase(rejection));
-    }, t.fail);
-
-    resolver.lfold(t.fail, toUpperCase).fork(function(msg) {
-      t.equal(msg, toUpperCase(resolution));
-    }, t.fail);
+  it('should fold given func from resolved to resolved', function(assert) {
+    resolver.fold(assert.fail, toUpperCase).fork(assert.fail, function(msg) {
+      assert.equal(msg, toUpperCase(resolution));
+    });
   });
 });
 
-test('Future#swap', function(t) {
-  t.plan(2);
-
-  rejecter.swap().fork(t.fail, function(msg) {
-    t.equal(msg, rejection);
+describe('lfold', function(it) {
+  it('should fold given func from rejected to rejected', function(assert) {
+    rejecter.lfold(toUpperCase, assert.fail).fork(function(msg) {
+      assert.equal(msg, toUpperCase(rejection));
+    }, assert.fail);
   });
 
-  resolver.swap().fork(function(msg) {
-    t.equal(msg, resolution);
-  }, t.fail);
+  it('should fold given func from resolved to rejected', function(assert) {
+    resolver.lfold(assert.fail, toUpperCase).fork(function(msg) {
+      assert.equal(msg, toUpperCase(resolution));
+    }, assert.fail);
+  });
 });
 
-test('Future#ap', function(t) {
-  t.plan(2);
+describe('swap', function(it) {
+  it('should swap rejected for resolved', function(assert) {
+    rejecter.swap().fork(assert.fail, function(msg) {
+      assert.equal(msg, rejection);
+    });
+  });
 
+  it('should swap resolved for rejected', function(assert) {
+    resolver.swap().fork(function(msg) {
+      assert.equal(msg, resolution);
+    }, assert.fail);
+  });
+});
+
+describe('ap', function(it) {
   var future = Future.resolve(toUpperCase);
 
-  future.ap(rejecter).fork(function(msg) {
-    t.equal(msg, rejection);
-  }, t.fail);
+  it('should not apply purified func to rejected', function(assert) {
+    future.ap(rejecter).fork(function(msg) {
+      assert.equal(msg, rejection);
+    }, assert.fail);
+  });
 
-  future.ap(resolver).fork(t.fail, function(msg) {
-    t.equal(msg, toUpperCase(resolution));
+  it('should apply purified func to resolved', function(assert) {
+    future.ap(resolver).fork(assert.fail, function(msg) {
+      assert.equal(msg, toUpperCase(resolution));
+    });
   });
 });
