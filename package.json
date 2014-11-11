@@ -24,6 +24,6 @@
   },
   "homepage": "https://github.com/L8D/proph",
   "devDependencies": {
-    "tape": "~3.0.1"
+    "tape-bdd": "~0.0.1"
   }
 }
