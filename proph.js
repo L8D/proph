@@ -31,7 +31,7 @@
 
   // reject :: a -> Future a b
   Future.reject = function reject(rejection) {
-    return new Future(function(reject, resolve) {
+    return new Future(function(reject) {
       reject(rejection);
     });
   };
@@ -194,7 +194,7 @@
     lfold: function lfold(rejector, resolver) {
       var fork = this.fork;
 
-      return new Future(function(reject, resolve) {
+      return new Future(function(reject) {
         fork(function(left) {
           reject(rejector(left));
         }, function(right) {
