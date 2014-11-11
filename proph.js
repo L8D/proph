@@ -53,7 +53,7 @@
             reject(left);
           }
         }, function(right) {
-          resolutions[index] = b;
+          resolutions[index] = right;
 
           if (!rejected && !--unfinished) {
             resolve(resolutions);
