@@ -11,7 +11,7 @@ var resolver = Future.resolve(resolution);
 
 function toUpperCase(str) {
   return str.toUpperCase();
-};
+}
 
 describe('fork', function(it) {
   it('should call resolver callback for resolved', function(assert) {
