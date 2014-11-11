@@ -4,7 +4,8 @@
   "description": "A tiny, simple and fast futures implementation.",
   "main": "proph.js",
   "scripts": {
-    "test": "./node_modules/.bin/tape test/*.js"
+    "lint": "jshint .",
+    "test": "npm run lint && node test"
   },
   "repository": {
     "type": "git",
@@ -24,6 +25,7 @@
   },
   "homepage": "https://github.com/L8D/proph",
   "devDependencies": {
+    "jshint": "^2.5.10",
     "tape-bdd": "~0.0.1"
   }
 }
