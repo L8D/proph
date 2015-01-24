@@ -5,7 +5,7 @@
   "main": "proph.js",
   "scripts": {
     "lint": "jshint .",
-    "test": "npm run lint && node test"
+    "test": "npm run lint && mocha"
   },
   "repository": {
     "type": "git",
@@ -26,6 +26,6 @@
   "homepage": "https://github.com/L8D/proph",
   "devDependencies": {
     "jshint": "^2.5.10",
-    "tape-bdd": "~0.0.1"
+    "mocha": "^2.1.0"
   }
 }
